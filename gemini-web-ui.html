@@ -18,15 +18,16 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
 
         .container {
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 800px;
-            height: 80vh;
+            width: 100%;
+            max-width: 900px;
+            height: 85vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -35,32 +36,36 @@
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px;
+            padding: 25px 30px;
             text-align: center;
+            flex-shrink: 0;
         }
 
         .header h1 {
-            font-size: 2rem;
-            margin-bottom: 5px;
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
         .header p {
-            opacity: 0.9;
-            font-size: 0.9rem;
+            opacity: 0.95;
+            font-size: 1rem;
+            line-height: 1.4;
         }
 
         .chat-container {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            padding: 25px 30px;
             overflow-y: auto;
+            gap: 20px;
         }
 
         .message {
-            margin-bottom: 20px;
             display: flex;
             align-items: flex-start;
+            gap: 12px;
         }
 
         .message.user {
@@ -68,82 +73,116 @@
         }
 
         .message-content {
-            max-width: 70%;
-            padding: 15px 20px;
-            border-radius: 20px;
+            max-width: 75%;
+            padding: 18px 24px;
+            border-radius: 18px;
             word-wrap: break-word;
+            line-height: 1.5;
+            font-size: 0.95rem;
         }
 
         .message.user .message-content {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border-bottom-right-radius: 5px;
+            border-bottom-right-radius: 6px;
         }
 
         .message.assistant .message-content {
             background: #f8f9fa;
             color: #333;
-            border-bottom-left-radius: 5px;
+            border-bottom-left-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+
+        .message-content pre {
+            background: #f1f3f4;
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .message-content code {
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
         }
 
         .input-container {
-            padding: 20px;
+            padding: 25px 30px;
             background: #f8f9fa;
             border-top: 1px solid #e9ecef;
+            flex-shrink: 0;
         }
 
         .input-wrapper {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             align-items: flex-end;
         }
 
         .input-field {
             flex: 1;
-            padding: 15px;
+            padding: 18px 24px;
             border: 2px solid #e9ecef;
             border-radius: 25px;
             font-size: 1rem;
             outline: none;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
             resize: none;
-            min-height: 50px;
+            min-height: 55px;
             max-height: 120px;
+            font-family: inherit;
+            line-height: 1.4;
         }
 
         .input-field:focus {
             border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .send-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 15px 25px;
+            padding: 18px 28px;
             border-radius: 25px;
             cursor: pointer;
             font-size: 1rem;
-            transition: transform 0.2s;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
         }
 
         .send-btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .send-btn:active {
+            transform: translateY(0);
         }
 
         .send-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
 
         .loading {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            margin-right: 8px;
         }
 
         @keyframes spin {
@@ -153,26 +192,81 @@
 
         .status {
             text-align: center;
-            padding: 10px;
+            padding: 12px;
             background: #e9ecef;
             color: #666;
             font-size: 0.9rem;
+            border-radius: 8px;
+            margin: 10px 0;
         }
 
         .error {
             background: #f8d7da;
             color: #721c24;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 12px 16px;
+            border-radius: 8px;
             margin: 10px 0;
+            border: 1px solid #f5c6cb;
         }
 
         .success {
             background: #d4edda;
             color: #155724;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 12px 16px;
+            border-radius: 8px;
             margin: 10px 0;
+            border: 1px solid #c3e6cb;
+        }
+
+        /* Scrollbar styling */
+        .chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                height: 90vh;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .chat-container {
+                padding: 20px;
+            }
+            
+            .input-container {
+                padding: 20px;
+            }
+            
+            .message-content {
+                max-width: 85%;
+                padding: 15px 20px;
+            }
         }
     </style>
 </head>
@@ -306,24 +400,22 @@
             if (lowerMessage.includes('react') || lowerMessage.includes('component')) {
                 return `Here's a simple React component example:
 
-\`\`\`jsx
-import React, { useState } from 'react';
+<pre><code>import React, { useState } from 'react';
 
 function MyComponent() {
   const [count, setCount] = useState(0);
   
   return (
-    <div>
-      <h2>Count: {count}</h2>
-      <button onClick={() => setCount(count + 1)}>
+    &lt;div&gt;
+      &lt;h2&gt;Count: {count}&lt;/h2&gt;
+      &lt;button onClick={() =&gt; setCount(count + 1)}&gt;
         Increment
-      </button>
-    </div>
+      &lt;/button&gt;
+    &lt;/div&gt;
   );
 }
 
-export default MyComponent;
-\`\`\`
+export default MyComponent;</code></pre>
 
 This component demonstrates:
 • State management with useState
@@ -335,8 +427,7 @@ This component demonstrates:
             if (lowerMessage.includes('python') || lowerMessage.includes('script')) {
                 return `Here's a Python script example:
 
-\`\`\`python
-import requests
+<pre><code>import requests
 import json
 
 def fetch_data(url):
@@ -351,8 +442,7 @@ def fetch_data(url):
 # Example usage
 data = fetch_data('https://api.example.com/data')
 if data:
-    print(json.dumps(data, indent=2))
-\`\`\`
+    print(json.dumps(data, indent=2))</code></pre>
 
 This script shows:
 • HTTP requests with requests library
@@ -393,8 +483,8 @@ Just ask me anything related to programming!`;
 This is a demo interface. In a real implementation, this would connect to the actual Gemini CLI API to provide intelligent responses based on your codebase and context.
 
 To use the real Gemini CLI:
-1. Install it: \`npm install -g @google/gemini-cli\`
-2. Run it: \`gemini\`
+1. Install it: <code>npm install -g @google/gemini-cli</code>
+2. Run it: <code>gemini</code>
 3. Or use it programmatically with the API
 
 What would you like to know about programming or your code?`;
