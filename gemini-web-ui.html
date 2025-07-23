@@ -275,6 +275,10 @@
         <div class="header">
             <h1>🚀 Gemini CLI Web Interface</h1>
             <p>Your AI-powered coding assistant with a beautiful web interface</p>
+            <div style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">
+                <span id="projectStatus">📁 No project loaded</span>
+                <span id="modelStatus" style="margin-left: 20px;">🎭 Demo Mode</span>
+            </div>
         </div>
         
         <div class="chat-container" id="chatContainer">
@@ -301,6 +305,10 @@
                     placeholder="Ask Gemini anything... (e.g., 'Help me create a React component', 'Explain this code', 'Generate a Python script')"
                     rows="1"
                 ></textarea>
+                <input type="file" id="fileInput" accept=".js,.ts,.jsx,.tsx,.py,.java,.cpp,.c,.html,.css,.json,.md,.txt" style="display: none;">
+                <button id="uploadBtn" class="send-btn" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); margin-right: 10px;">
+                    📁 Upload
+                </button>
                 <button id="sendBtn" class="send-btn">
                     Send
                 </button>
@@ -312,6 +320,8 @@
         const chatContainer = document.getElementById('chatContainer');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileInput = document.getElementById('fileInput');
 
         // Auto-resize textarea
         messageInput.addEventListener('input', function() {
@@ -374,7 +384,7 @@
             showLoading();
 
             try {
-                // Simulate API call (replace with actual Gemini CLI integration)
+                // Use demo mode only
                 const response = await simulateGeminiResponse(message);
                 
                 // Remove loading and add response
@@ -480,20 +490,70 @@ Just ask me anything related to programming!`;
             // Default response
             return `I understand you said: "${message}"
 
-This is a demo interface. In a real implementation, this would connect to the actual Gemini CLI API to provide intelligent responses based on your codebase and context.
+This is a demo interface showcasing the Gemini CLI Web UI. All responses are simulated for demonstration purposes.
 
-To use the real Gemini CLI:
-1. Install it: <code>npm install -g @google/gemini-cli</code>
-2. Run it: <code>gemini</code>
-3. Or use it programmatically with the API
+Features demonstrated:
+• Beautiful chat interface
+• Code generation examples
+• File upload capability
+• Project management
+• Responsive design
 
 What would you like to know about programming or your code?`;
         }
 
         sendBtn.addEventListener('click', sendMessage);
 
+        // File upload functionality
+        uploadBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            try {
+                const content = await readFileContent(file);
+                const fileName = file.name;
+                
+                addMessage(`📁 Uploaded: <strong>${fileName}</strong>`, true);
+                addMessage(`<pre><code>${content}</code></pre>`);
+                
+                // Auto-generate a question about the uploaded file
+                const question = `Please analyze this ${fileName} file and explain what it does.`;
+                messageInput.value = question;
+                
+            } catch (error) {
+                addMessage(`❌ Error reading file: ${error.message}`);
+            }
+        });
+
+        function readFileContent(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = (e) => reject(new Error('Failed to read file'));
+                reader.readAsText(file);
+            });
+        }
+
         // Focus on input when page loads
         messageInput.focus();
+
+        // Add info message styling
+        const style = document.createElement('style');
+        style.textContent = `
+            .info {
+                background: #d1ecf1;
+                color: #0c5460;
+                padding: 12px 16px;
+                border-radius: 8px;
+                margin: 10px 0;
+                border: 1px solid #bee5eb;
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html> 

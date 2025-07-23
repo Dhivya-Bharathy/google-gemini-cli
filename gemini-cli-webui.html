@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini CLI WebUI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Top Banner */
+        .top-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+        }
+
+        .banner-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #f0f6fc;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0;
+        }
+
+        .nav-tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: #8b949e;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-tab.active {
+            color: #f0f6fc;
+            border-bottom-color: #58a6ff;
+            background: #161b22;
+        }
+
+        .nav-tab:hover {
+            color: #f0f6fc;
+            background: #21262d;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: #161b22;
+            border-right: 1px solid #30363d;
+            display: flex;
+            flex-direction: column;
+            margin-top: 50px;
+            height: calc(100vh - 50px);
+        }
+
+        .search-container {
+            padding: 16px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #c9d1d9;
+            font-size: 14px;
+        }
+
+        .search-input::placeholder {
+            color: #8b949e;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(56, 139, 253, 0.15);
+        }
+
+        .current-project {
+            padding: 16px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .project-path {
+            font-size: 14px;
+            color: #f0f6fc;
+            margin-bottom: 4px;
+        }
+
+        .project-count {
+            font-size: 12px;
+            color: #8b949e;
+        }
+
+        .new-session-btn {
+            margin: 16px;
+            padding: 10px 16px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .new-session-btn:hover {
+            background: #2ea043;
+        }
+
+        .sessions-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 16px;
+        }
+
+        .session-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #21262d;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .session-item:hover {
+            background: #21262d;
+        }
+
+        .session-query {
+            font-size: 14px;
+            color: #f0f6fc;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .session-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #8b949e;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-top: 50px;
+            height: calc(100vh - 50px);
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: #21262d;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .ai-avatar {
+            width: 24px;
+            height: 24px;
+            background: #58a6ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 12px;
+        }
+
+        .thinking {
+            color: #8b949e;
+            font-style: italic;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 12px;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .message.user .message-content {
+            background: #58a6ff;
+            color: white;
+        }
+
+        .message.assistant .message-content {
+            background: #21262d;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #8b949e;
+            margin-top: 4px;
+        }
+
+        .processing-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #21262d;
+            border-radius: 8px;
+            margin-top: auto;
+        }
+
+        .processing-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #30363d;
+            border-top: 2px solid #58a6ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stop-btn {
+            background: #da3633;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .stop-btn:hover {
+            background: #f85149;
+        }
+
+        .model-info {
+            font-size: 12px;
+            color: #8b949e;
+            margin-top: 8px;
+        }
+
+        /* Input Area */
+        .input-container {
+            padding: 20px;
+            background: #0d1117;
+            border-top: 1px solid #30363d;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 12px 16px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #c9d1d9;
+            font-size: 14px;
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+            font-family: inherit;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px rgba(56, 139, 253, 0.15);
+        }
+
+        .send-btn {
+            background: #238636;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s ease;
+        }
+
+        .send-btn:hover {
+            background: #2ea043;
+        }
+
+        .send-btn:disabled {
+            background: #30363d;
+            cursor: not-allowed;
+        }
+
+        /* Bottom accent */
+        .bottom-accent {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0d1117;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #484f58;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Banner -->
+        <div class="top-banner">
+            <div class="banner-title">Gemini CLI WebUI: POWER UP Your Gemini CLI by 10X & Access it ANYWHERE!</div>
+            <div class="nav-tabs">
+                <button class="nav-tab active">Chat</button>
+                <button class="nav-tab">Shell</button>
+                <button class="nav-tab">Files</button>
+                <button class="nav-tab">Source Control</button>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Q Search projects...">
+            </div>
+            
+            <div class="current-project">
+                <div class="project-path">/Users/dhivya/test-mm</div>
+                <div class="project-count">0</div>
+            </div>
+            
+            <button class="new-session-btn">+ New Session</button>
+            
+            <div class="sessions-list">
+                <div class="session-item">
+                    <div class="session-query">What is this project about?</div>
+                    <div class="session-meta">
+                        <span>3 hours ago</span>
+                        <span>2</span>
+                    </div>
+                </div>
+                <div class="session-item">
+                    <div class="session-query">hi</div>
+                    <div class="session-meta">
+                        <span>3 hours ago</span>
+                        <span>1</span>
+                    </div>
+                </div>
+                <div class="session-item">
+                    <div class="session-query">Create a simple calculator</div>
+                    <div class="session-meta">
+                        <span>2 hours ago</span>
+                        <span>3</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="new-session-btn">+ New Session</button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="chat-container" id="chatContainer">
+                <!-- Chat messages will appear here -->
+            </div>
+            
+            <div class="processing-bar" style="display: none;">
+                <div class="processing-left">
+                    <div class="spinner"></div>
+                    <span>Processing...</span>
+                </div>
+                <button class="stop-btn">× Stop</button>
+            </div>
+            
+            <div class="model-info">Gemini Default • gemini-2.5-flash</div>
+            
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        class="input-field" 
+                        placeholder="Ask Gemini anything..."
+                        rows="1"
+                    ></textarea>
+                    <button id="sendBtn" class="send-btn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom accent -->
+    <div class="bottom-accent"></div>
+
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        // Auto-resize textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        // Handle Enter key
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerHTML = content;
+            
+            // Add timestamp
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            contentDiv.appendChild(timeDiv);
+            
+            messageDiv.appendChild(contentDiv);
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function showProcessing() {
+            const processingBar = document.querySelector('.processing-bar');
+            processingBar.style.display = 'flex';
+        }
+
+        function hideProcessing() {
+            const processingBar = document.querySelector('.processing-bar');
+            processingBar.style.display = 'none';
+        }
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, true);
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+
+            // Show processing
+            showProcessing();
+
+            try {
+                // Simulate AI response
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                // Hide processing
+                hideProcessing();
+                
+                // Add AI response
+                const response = generateResponse(message);
+                addMessage(response);
+            } catch (error) {
+                hideProcessing();
+                addMessage(`❌ Error: ${error.message}`);
+            }
+        }
+
+        function generateResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('minesweeper')) {
+                return `I'll create a Minesweeper game for you! Here's a complete implementation:
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Minesweeper&lt;/title&gt;
+    &lt;style&gt;
+        .game {
+            display: inline-block;
+            background: #ccc;
+            padding: 10px;
+        }
+        .row {
+            display: flex;
+        }
+        .cell {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: #eee;
+        }
+        .cell.revealed {
+            background: #fff;
+        }
+        .cell.mine {
+            background: #ff0000;
+        }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;div id="game" class="game"&gt;&lt;/div&gt;
+    &lt;script&gt;
+        // Game logic here
+        const game = new Minesweeper(10, 10, 10);
+        game.init();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+This creates a 10x10 grid with 10 mines. The game includes:
+• Left click to reveal cells
+• Right click to flag mines
+• Win/lose conditions
+• Number indicators for adjacent mines
+
+Would you like me to add any specific features or modify the styling?`;
+            }
+            
+            if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
+                return `Hello! I'm Gemini, your AI coding assistant. I can help you with:
+• Creating web applications
+• Writing code in any language
+• Debugging and optimization
+• Explaining concepts
+• Project setup and configuration
+
+What would you like to work on today?`;
+            }
+            
+            return `I understand you're asking about: "${message}"
+
+I'm here to help you with any programming task! I can:
+• Generate complete applications
+• Write code snippets
+• Debug existing code
+• Explain programming concepts
+• Help with project setup
+
+What specific help do you need?`;
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+
+        // Focus on input when page loads
+        messageInput.focus();
+
+        // Handle tab switching
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Handle session items
+        document.querySelectorAll('.session-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const query = this.querySelector('.session-query').textContent;
+                messageInput.value = query;
+                messageInput.focus();
+            });
+        });
+    </script>
+</body>
+</html> 
